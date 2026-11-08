@@ -2,6 +2,7 @@ app:
   description: 面向老年人的出行助手：旅游攻略、查票购票指导、出行健康与天气提醒，说话简单、步骤清楚、注意防骗。
   icon: 🧓
   icon_background: '#FFEAD5'
+  icon_type: emoji
   mode: advanced-chat
   name: 老人出行小助手
   use_icon_as_answer_icon: false
@@ -9,20 +10,73 @@ dependencies:
 - current_identifier: null
   type: marketplace
   value:
-    marketplace_plugin_unique_identifier: langgenius/tongyi:0.2.27@d9409c7d4e1ab9358330ee1c9897c29060f739657ec11e4aaab92f4265b376b6
+    marketplace_plugin_unique_identifier: langgenius/agent:0.0.51@3c6c32e593b33476cb52f4e5aaf1bf23e1c71b3d07ba64d40690e0dbce3a7e34
+    version: null
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/deepseek:0.0.26@bdf47cb41e9062bba00d26625d2a795c1874011d8ce64bff738c44b5a31787ea
     version: null
 kind: app
-version: 0.4.0
+site:
+  chat_color_theme: null
+  chat_color_theme_inverted: false
+  copyright: null
+  custom_disclaimer: ''
+  default_language: zh-Hans
+  description: null
+  icon: 🧓
+  icon_background: '#FFEAD5'
+  icon_type: emoji
+  input_placeholder: null
+  privacy_policy: null
+  show_workflow_steps: false
+  title: 老人出行小助手
+  use_icon_as_answer_icon: false
+version: 0.7.0
 workflow:
   conversation_variables: []
   environment_variables: []
   features:
     file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
       enabled: false
-    opening_statement: |-
-      您好！我是您的出行小助手 😊
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 50
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        knowledge_file_size_limit: 15
+        single_chunk_attachment_limit: 10
+        skill_file_size_limit: 50
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: '您好！我是您的出行小助手 😊
+
       您可以直接告诉我：想去哪儿玩、想查哪天的车票，或者出门要注意什么。
-      说得不清楚也没关系，我会一步一步问您。
+
+      说得不清楚也没关系，我会一步一步问您。'
     retriever_resource:
       enabled: false
     sensitive_word_avoidance:
@@ -41,465 +95,2689 @@ workflow:
       voice: ''
   graph:
     edges:
-    - id: e_start_today
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: code
+      id: e_start_today
       source: start
       sourceHandle: source
       target: today
       targetHandle: target
       type: custom
-      data:
+      zIndex: 0
+    - data:
         isInIteration: false
-        sourceType: start
-        targetType: code
-    - id: e_today_classify
+        isInLoop: false
+        sourceType: code
+        targetType: question-classifier
+      id: e_today_classify
       source: today
       sourceHandle: source
       target: classify
       targetHandle: target
       type: custom
-      data:
+      zIndex: 0
+    - data:
         isInIteration: false
-        sourceType: code
-        targetType: question-classifier
-    - id: e_classify_trip
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: agent
+      id: e_classify_trip
       source: classify
       sourceHandle: '1'
       target: trip
       targetHandle: target
       type: custom
-      data:
+      zIndex: 0
+    - data:
         isInIteration: false
+        isInLoop: false
         sourceType: question-classifier
-        targetType: llm
-    - id: e_classify_ticket
+        targetType: agent
+      id: e_classify_ticket
       source: classify
       sourceHandle: '2'
       target: ticket
       targetHandle: target
       type: custom
-      data:
+      zIndex: 0
+    - data:
         isInIteration: false
+        isInLoop: false
         sourceType: question-classifier
-        targetType: llm
-    - id: e_classify_health
+        targetType: agent
+      id: e_classify_health
       source: classify
       sourceHandle: '3'
       target: health
       targetHandle: target
       type: custom
-      data:
+      zIndex: 0
+    - data:
         isInIteration: false
+        isInLoop: false
         sourceType: question-classifier
         targetType: llm
-    - id: e_classify_chat
+      id: e_classify_chat
       source: classify
       sourceHandle: '4'
       target: chat
       targetHandle: target
       type: custom
-      data:
+      zIndex: 0
+    - data:
         isInIteration: false
-        sourceType: question-classifier
-        targetType: llm
-    - id: e_trip_ans
+        isInLoop: false
+        sourceType: agent
+        targetType: answer
+      id: e_trip_ans
       source: trip
       sourceHandle: source
       target: ans_trip
       targetHandle: target
       type: custom
-      data:
+      zIndex: 0
+    - data:
         isInIteration: false
-        sourceType: llm
+        isInLoop: false
+        sourceType: agent
         targetType: answer
-    - id: e_ticket_ans
+      id: e_ticket_ans
       source: ticket
       sourceHandle: source
       target: ans_ticket
       targetHandle: target
       type: custom
-      data:
+      zIndex: 0
+    - data:
         isInIteration: false
-        sourceType: llm
+        isInLoop: false
+        sourceType: agent
         targetType: answer
-    - id: e_health_ans
+      id: e_health_ans
       source: health
       sourceHandle: source
       target: ans_health
       targetHandle: target
       type: custom
-      data:
+      zIndex: 0
+    - data:
         isInIteration: false
+        isInLoop: false
         sourceType: llm
         targetType: answer
-    - id: e_chat_ans
+      id: e_chat_ans
       source: chat
       sourceHandle: source
       target: ans_chat
       targetHandle: target
       type: custom
-      data:
-        isInIteration: false
-        sourceType: llm
-        targetType: answer
+      zIndex: 0
     nodes:
-    - id: start
-      type: custom
-      position: {x: 30, y: 300}
-      positionAbsolute: {x: 30, y: 300}
-      width: 244
-      height: 54
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      data:
-        type: start
-        title: 开始
+    - data:
         desc: ''
         selected: false
+        title: 开始
+        type: start
         variables: []
-    - id: today
-      type: custom
-      position: {x: 330, y: 300}
-      positionAbsolute: {x: 330, y: 300}
-      width: 244
-      height: 54
+      height: 73
+      id: start
+      position:
+        x: 30
+        y: 300
+      positionAbsolute:
+        x: 30
+        y: 300
       selected: false
       sourcePosition: right
       targetPosition: left
-      data:
-        type: code
-        title: 获取今天日期
-        desc: 北京时间的今天日期和星期，供后面安排行程、查票时参考
-        selected: false
+      type: custom
+      width: 242
+      zIndex: 0
+    - data:
+        code: "from datetime import datetime, timedelta, timezone\n\n\ndef main()\
+          \ -> dict:\n    now = datetime.now(timezone(timedelta(hours=8)))\n    weekdays\
+          \ = [\"一\", \"二\", \"三\", \"四\", \"五\", \"六\", \"日\"]\n    return {\n  \
+          \      \"today\": now.strftime(\"%Y年%m月%d日\") + \"，星期\" + weekdays[now.weekday()],\n\
+          \    }\n"
         code_language: python3
-        code: |
-          from datetime import datetime, timedelta, timezone
-
-
-          def main() -> dict:
-              now = datetime.now(timezone(timedelta(hours=8)))
-              weekdays = ["一", "二", "三", "四", "五", "六", "日"]
-              return {
-                  "today": now.strftime("%Y年%m月%d日") + "，星期" + weekdays[now.weekday()],
-              }
-        variables: []
+        desc: 北京时间的今天日期和星期，供后面安排行程、查票时参考
         outputs:
           today:
-            type: string
             children: null
-    - id: classify
-      type: custom
-      position: {x: 630, y: 300}
-      positionAbsolute: {x: 630, y: 300}
-      width: 244
-      height: 250
+            type: string
+        selected: false
+        title: 获取今天日期
+        type: code
+        variables: []
+      height: 96
+      id: today
+      position:
+        x: 330
+        y: 300
+      positionAbsolute:
+        x: 330
+        y: 300
       selected: false
       sourcePosition: right
       targetPosition: left
-      data:
-        type: question-classifier
-        title: 判断老人想做什么
-        desc: ''
-        selected: false
-        query_variable_selector:
-        - sys
-        - query
-        model:
-          provider: langgenius/tongyi/tongyi
-          name: qwen3.6-flash
-          mode: chat
-          completion_params:
-            temperature: 0.1
+      type: custom
+      width: 242
+      zIndex: 0
+    - data:
         classes:
         - id: '1'
-          name: 旅游攻略：想去哪里玩、行程安排、景点、住宿、吃什么、怎么玩
+          name: 旅游攻略和完整行程：说了去哪里玩、哪天出发、玩几天，或想要行程安排、景点、住宿、吃什么
         - id: '2'
-          name: 车票机票：查火车票/高铁/飞机票、怎么买票、退票改签、到车站机场怎么走
+          name: 单独问车票机票：只问车次、余票、怎么买票、退票改签、到车站机场怎么走
         - id: '3'
           name: 出行健康与注意事项：身体状况、带什么药、天气、穿衣、安全提醒
         - id: '4'
           name: 其他：打招呼、闲聊、看不懂、不属于以上的问题
+        desc: ''
         instruction: 用户是老年人，说话可能口语化、带方言或不完整。结合上下文判断，比如“那后天呢”通常是在接着上一个话题问。
         instructions: ''
-        topics: []
-        vision:
-          enabled: false
         memory:
           window:
             enabled: true
             size: 6
-    - id: trip
-      type: custom
-      position: {x: 960, y: 100}
-      positionAbsolute: {x: 960, y: 100}
-      width: 244
-      height: 98
+        model:
+          completion_params:
+            temperature: 0.1
+            thinking: false
+          mode: chat
+          name: deepseek-v4-flash
+          provider: langgenius/deepseek/deepseek
+        query_variable_selector:
+        - sys
+        - query
+        selected: false
+        title: 判断老人想做什么
+        topics: []
+        type: question-classifier
+        vision:
+          enabled: false
+      height: 262
+      id: classify
+      position:
+        x: 630
+        y: 300
+      positionAbsolute:
+        x: 630
+        y: 300
       selected: false
       sourcePosition: right
       targetPosition: left
-      data:
-        type: llm
+      type: custom
+      width: 242
+      zIndex: 0
+    - data:
+        agent_parameters:
+          instruction:
+            type: constant
+            value: '你是一位专业又贴心的旅行社顾问，专门为老年人定制出行方案。今天是{{#today.today#}}。
+
+
+              【需要的信息】出发城市、目的地、出发日期、玩几天。缺哪项就只问哪项（一次最多问两个）；人数没说默认按 2 位老人算，身体情况没说就按“腿脚一般”安排。信息齐了直接出完整方案，不要反复确认。
+
+              如果老人只是问某个景点或某个小问题，就直接简短回答，不用出整份行程。
+
+
+              【查资料】先全部查完再回答；调用工具之前不要输出任何文字，不要写开场白，不要说“我来为您安排”“先查一下”之类的话；出完整行程时，回答直接从“##
+              行程总览”开始。
+
+              1. 车票：先用 get-station-code-of-citys 查两个城市的车站代码，再用 get-tickets 分别查：去程查出发日期上午
+              8 点到 12 点出发的；返程查最后一天下午 1 点到 5 点出发的（最后一天上午还能玩一个轻松的地方）。只看高铁、动车，limitedNum
+              设为 5；返程优先回到出发时的车站或市区主要车站。每日安排里的时间要和推荐的车次对得上。各挑 1～2 趟推荐，写清车次、出发和到达时间及车站、历时、二等座票价、是否有票。
+
+              2. 天气：用 maps_weather 查目的地。高德只能查最近几天的预报，出发日期超出范围时，按当地这个季节的一般气温估计，并写明“出发前一天请再看一次天气预报”。
+
+              3. 景点和酒店：用 maps_text_search 找景点和酒店（选交通方便、离景点近的），用 maps_around_search
+              查酒店附近的医院；需要时用 maps_geo 加 maps_direction_transit_integrated 或 maps_direction_walking
+              查路线和步行时间。
+
+              工具查到的照实写；查不到的写“建议出发前确认”，不要编造车次、时间、价格。回答里不要出现工具名称、车站代码、经纬度。
+
+
+              【安排原则】
+
+              - 每天最多 2 个主要景点，中午安排休息 1～2 小时，晚上 8 点前回酒店。
+
+              - 少走路、少换乘，优先有观光车、电梯、无障碍通道的景点，标出步行大约多久。
+
+              - 第一天和最后一天以坐车为主，只安排轻松活动。
+
+              - 提醒老年优惠：很多景区 60 岁或 65 岁以上凭身份证免票或半价，以景区公告为准。
+
+
+              【输出格式，按顺序】
+
+              ## 行程总览
+
+              一两句话：几月几日到几月几日，从哪里到哪里，几天，什么节奏。
+
+              ## 往返车票
+
+              去程、返程各一个小表格：车次｜出发→到达｜历时｜二等座价格｜余票。表格下写一句购票提醒：用 12306「敬老版」购买，60 岁以上旅客会优先安排下铺，高铁可选靠过道座位。
+
+              ## 每日安排
+
+              每天一个小标题“第X天（X月X日 星期X）天气”，按上午、中午、下午、晚上列出：做什么、怎么去、大约花多少钱。
+
+              ## 住宿建议
+
+              酒店名称、位置、推荐理由、附近的医院。
+
+              ## 穿衣和行李清单
+
+              按天数和天气写具体件数，例如“长袖上衣 3 件、厚外套 1 件”。再加：常用药（多带 2 天的量）、身份证、医保卡、老花镜、充电宝、写有紧急联系人电话的纸条。
+
+              ## 注意事项
+
+              3～5 条，结合目的地、季节和老人身体情况，含一条防骗提醒。
+
+              ## 费用估算（每人）
+
+              表格：交通（车票加市内）｜门票｜住宿｜餐饮｜其他｜合计。车票用查到的价格，其余标“估算”。
+
+              最后问一句要不要调整，比如换日子、少去一个景点。
+
+
+              语言要求：短句、不用英文、数字写清楚。'
+          maximum_iterations:
+            type: constant
+            value: 12
+          model:
+            type: constant
+            value:
+              completion_params:
+                max_tokens: 8000
+                temperature: 0.6
+                thinking: false
+              mode: chat
+              model: deepseek-v4-flash
+              model_type: llm
+              provider: langgenius/deepseek/deepseek
+              type: model-selector
+          query:
+            type: constant
+            value: '{{#sys.query#}}'
+          tools:
+            type: constant
+            value:
+            - enabled: true
+              extra:
+                description: ''
+              parameters: {}
+              provider_name: train12306
+              provider_show_name: 12306查票
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 要查询的城市，比如"北京"。若要查询多个城市，请用|分割，比如"北京|上海"。
+                  ja_JP: 要查询的城市，比如"北京"。若要查询多个城市，请用|分割，比如"北京|上海"。
+                  pt_BR: 要查询的城市，比如"北京"。若要查询多个城市，请用|分割，比如"北京|上海"。
+                  zh_Hans: 要查询的城市，比如"北京"。若要查询多个城市，请用|分割，比如"北京|上海"。
+                input_schema: null
+                label:
+                  en_US: citys
+                  ja_JP: citys
+                  pt_BR: citys
+                  zh_Hans: citys
+                llm_description: 要查询的城市，比如"北京"。若要查询多个城市，请用|分割，比如"北京|上海"。
+                max: null
+                min: null
+                multiple: false
+                name: citys
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              settings: {}
+              tool_description: 通过中文城市名查询代表该城市的 `station_code`。
+              tool_label: get-station-code-of-citys
+              tool_name: get-station-code-of-citys
+              type: mcp
+            - enabled: true
+              extra:
+                description: ''
+              parameters: {}
+              provider_name: train12306
+              provider_show_name: 12306查票
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 查询日期，格式为 "yyyy-MM-dd"。如果用户提供的是相对日期（如“明天”），请务必先调用 `get-current-date`
+                    接口获取当前日期，并计算出目标日期。
+                  ja_JP: 查询日期，格式为 "yyyy-MM-dd"。如果用户提供的是相对日期（如“明天”），请务必先调用 `get-current-date`
+                    接口获取当前日期，并计算出目标日期。
+                  pt_BR: 查询日期，格式为 "yyyy-MM-dd"。如果用户提供的是相对日期（如“明天”），请务必先调用 `get-current-date`
+                    接口获取当前日期，并计算出目标日期。
+                  zh_Hans: 查询日期，格式为 "yyyy-MM-dd"。如果用户提供的是相对日期（如“明天”），请务必先调用 `get-current-date`
+                    接口获取当前日期，并计算出目标日期。
+                input_schema: null
+                label:
+                  en_US: date
+                  ja_JP: date
+                  pt_BR: date
+                  zh_Hans: date
+                llm_description: 查询日期，格式为 "yyyy-MM-dd"。如果用户提供的是相对日期（如“明天”），请务必先调用
+                  `get-current-date` 接口获取当前日期，并计算出目标日期。
+                max: null
+                min: null
+                multiple: false
+                name: date
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 出发地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                  ja_JP: 出发地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                  pt_BR: 出发地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                  zh_Hans: 出发地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                input_schema: null
+                label:
+                  en_US: fromStation
+                  ja_JP: fromStation
+                  pt_BR: fromStation
+                  zh_Hans: fromStation
+                llm_description: 出发地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                  或 `get-station-code-of-citys` 接口查询得到）
+                max: null
+                min: null
+                multiple: false
+                name: fromStation
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 到达地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                  ja_JP: 到达地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                  pt_BR: 到达地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                  zh_Hans: 到达地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                input_schema: null
+                label:
+                  en_US: toStation
+                  ja_JP: toStation
+                  pt_BR: toStation
+                  zh_Hans: toStation
+                llm_description: 到达地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                  或 `get-station-code-of-citys` 接口查询得到）
+                max: null
+                min: null
+                multiple: false
+                name: toStation
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 车次筛选条件，默认为空，即不筛选。支持多个标志同时筛选。例如用户说“高铁票”，则应使用 "G"。可选标志：[G(高铁/城际),D(动车),Z(直达特快),T(特快),K(快速),O(其他),F(复兴号),S(智能动车组)]
+                  ja_JP: 车次筛选条件，默认为空，即不筛选。支持多个标志同时筛选。例如用户说“高铁票”，则应使用 "G"。可选标志：[G(高铁/城际),D(动车),Z(直达特快),T(特快),K(快速),O(其他),F(复兴号),S(智能动车组)]
+                  pt_BR: 车次筛选条件，默认为空，即不筛选。支持多个标志同时筛选。例如用户说“高铁票”，则应使用 "G"。可选标志：[G(高铁/城际),D(动车),Z(直达特快),T(特快),K(快速),O(其他),F(复兴号),S(智能动车组)]
+                  zh_Hans: 车次筛选条件，默认为空，即不筛选。支持多个标志同时筛选。例如用户说“高铁票”，则应使用 "G"。可选标志：[G(高铁/城际),D(动车),Z(直达特快),T(特快),K(快速),O(其他),F(复兴号),S(智能动车组)]
+                input_schema: null
+                label:
+                  en_US: trainFilterFlags
+                  ja_JP: trainFilterFlags
+                  pt_BR: trainFilterFlags
+                  zh_Hans: trainFilterFlags
+                llm_description: 车次筛选条件，默认为空，即不筛选。支持多个标志同时筛选。例如用户说“高铁票”，则应使用 "G"。可选标志：[G(高铁/城际),D(动车),Z(直达特快),T(特快),K(快速),O(其他),F(复兴号),S(智能动车组)]
+                max: null
+                min: null
+                multiple: false
+                name: trainFilterFlags
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 最早出发时间（0-24），默认为0。
+                  ja_JP: 最早出发时间（0-24），默认为0。
+                  pt_BR: 最早出发时间（0-24），默认为0。
+                  zh_Hans: 最早出发时间（0-24），默认为0。
+                input_schema: null
+                label:
+                  en_US: earliestStartTime
+                  ja_JP: earliestStartTime
+                  pt_BR: earliestStartTime
+                  zh_Hans: earliestStartTime
+                llm_description: 最早出发时间（0-24），默认为0。
+                max: null
+                min: null
+                multiple: false
+                name: earliestStartTime
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: number
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 最迟出发时间（0-24），默认为24。
+                  ja_JP: 最迟出发时间（0-24），默认为24。
+                  pt_BR: 最迟出发时间（0-24），默认为24。
+                  zh_Hans: 最迟出发时间（0-24），默认为24。
+                input_schema: null
+                label:
+                  en_US: latestStartTime
+                  ja_JP: latestStartTime
+                  pt_BR: latestStartTime
+                  zh_Hans: latestStartTime
+                llm_description: 最迟出发时间（0-24），默认为24。
+                max: null
+                min: null
+                multiple: false
+                name: latestStartTime
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: number
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 排序方式，默认为空，即不排序。仅支持单一标识。可选标志：[startTime(出发时间从早到晚), arriveTime(抵达时间从早到晚),
+                    duration(历时从短到长)]
+                  ja_JP: 排序方式，默认为空，即不排序。仅支持单一标识。可选标志：[startTime(出发时间从早到晚), arriveTime(抵达时间从早到晚),
+                    duration(历时从短到长)]
+                  pt_BR: 排序方式，默认为空，即不排序。仅支持单一标识。可选标志：[startTime(出发时间从早到晚), arriveTime(抵达时间从早到晚),
+                    duration(历时从短到长)]
+                  zh_Hans: 排序方式，默认为空，即不排序。仅支持单一标识。可选标志：[startTime(出发时间从早到晚), arriveTime(抵达时间从早到晚),
+                    duration(历时从短到长)]
+                input_schema: null
+                label:
+                  en_US: sortFlag
+                  ja_JP: sortFlag
+                  pt_BR: sortFlag
+                  zh_Hans: sortFlag
+                llm_description: 排序方式，默认为空，即不排序。仅支持单一标识。可选标志：[startTime(出发时间从早到晚),
+                  arriveTime(抵达时间从早到晚), duration(历时从短到长)]
+                max: null
+                min: null
+                multiple: false
+                name: sortFlag
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 是否逆向排序结果，默认为false。仅在设置了sortFlag时生效。
+                  ja_JP: 是否逆向排序结果，默认为false。仅在设置了sortFlag时生效。
+                  pt_BR: 是否逆向排序结果，默认为false。仅在设置了sortFlag时生效。
+                  zh_Hans: 是否逆向排序结果，默认为false。仅在设置了sortFlag时生效。
+                input_schema: null
+                label:
+                  en_US: sortReverse
+                  ja_JP: sortReverse
+                  pt_BR: sortReverse
+                  zh_Hans: sortReverse
+                llm_description: 是否逆向排序结果，默认为false。仅在设置了sortFlag时生效。
+                max: null
+                min: null
+                multiple: false
+                name: sortReverse
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: boolean
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 返回的余票数量限制，默认为0，即不限制。
+                  ja_JP: 返回的余票数量限制，默认为0，即不限制。
+                  pt_BR: 返回的余票数量限制，默认为0，即不限制。
+                  zh_Hans: 返回的余票数量限制，默认为0，即不限制。
+                input_schema: null
+                label:
+                  en_US: limitedNum
+                  ja_JP: limitedNum
+                  pt_BR: limitedNum
+                  zh_Hans: limitedNum
+                llm_description: 返回的余票数量限制，默认为0，即不限制。
+                max: null
+                min: null
+                multiple: false
+                name: limitedNum
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: number
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 返回结果格式，默认为text，建议使用text与csv。可选标志：[text, csv, json]
+                  ja_JP: 返回结果格式，默认为text，建议使用text与csv。可选标志：[text, csv, json]
+                  pt_BR: 返回结果格式，默认为text，建议使用text与csv。可选标志：[text, csv, json]
+                  zh_Hans: 返回结果格式，默认为text，建议使用text与csv。可选标志：[text, csv, json]
+                input_schema: null
+                label:
+                  en_US: format
+                  ja_JP: format
+                  pt_BR: format
+                  zh_Hans: format
+                llm_description: 返回结果格式，默认为text，建议使用text与csv。可选标志：[text, csv, json]
+                max: null
+                min: null
+                multiple: false
+                name: format
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              settings: {}
+              tool_description: 查询12306余票信息。
+              tool_label: get-tickets
+              tool_name: get-tickets
+              type: mcp
+            - enabled: true
+              extra:
+                description: ''
+              parameters: {}
+              provider_name: amap
+              provider_show_name: 高德地图
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 城市名称或者adcode
+                  ja_JP: 城市名称或者adcode
+                  pt_BR: 城市名称或者adcode
+                  zh_Hans: 城市名称或者adcode
+                input_schema: null
+                label:
+                  en_US: city
+                  ja_JP: city
+                  pt_BR: city
+                  zh_Hans: city
+                llm_description: 城市名称或者adcode
+                max: null
+                min: null
+                multiple: false
+                name: city
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              settings: {}
+              tool_description: 根据城市名称或者标准adcode查询指定城市的天气
+              tool_label: maps_weather
+              tool_name: maps_weather
+              type: mcp
+            - enabled: true
+              extra:
+                description: ''
+              parameters: {}
+              provider_name: amap
+              provider_show_name: 高德地图
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 待解析的结构化地址信息
+                  ja_JP: 待解析的结构化地址信息
+                  pt_BR: 待解析的结构化地址信息
+                  zh_Hans: 待解析的结构化地址信息
+                input_schema: null
+                label:
+                  en_US: address
+                  ja_JP: address
+                  pt_BR: address
+                  zh_Hans: address
+                llm_description: 待解析的结构化地址信息
+                max: null
+                min: null
+                multiple: false
+                name: address
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 指定查询的城市
+                  ja_JP: 指定查询的城市
+                  pt_BR: 指定查询的城市
+                  zh_Hans: 指定查询的城市
+                input_schema: null
+                label:
+                  en_US: city
+                  ja_JP: city
+                  pt_BR: city
+                  zh_Hans: city
+                llm_description: 指定查询的城市
+                max: null
+                min: null
+                multiple: false
+                name: city
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              settings: {}
+              tool_description: 将详细的结构化地址转换为经纬度坐标。支持对地标性名胜景区、建筑物名称解析为经纬度坐标
+              tool_label: maps_geo
+              tool_name: maps_geo
+              type: mcp
+            - enabled: true
+              extra:
+                description: ''
+              parameters: {}
+              provider_name: amap
+              provider_show_name: 高德地图
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 查询关键字
+                  ja_JP: 查询关键字
+                  pt_BR: 查询关键字
+                  zh_Hans: 查询关键字
+                input_schema: null
+                label:
+                  en_US: keywords
+                  ja_JP: keywords
+                  pt_BR: keywords
+                  zh_Hans: keywords
+                llm_description: 查询关键字
+                max: null
+                min: null
+                multiple: false
+                name: keywords
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 查询城市
+                  ja_JP: 查询城市
+                  pt_BR: 查询城市
+                  zh_Hans: 查询城市
+                input_schema: null
+                label:
+                  en_US: city
+                  ja_JP: city
+                  pt_BR: city
+                  zh_Hans: city
+                llm_description: 查询城市
+                max: null
+                min: null
+                multiple: false
+                name: city
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 是否限制城市范围内搜索，默认不限制
+                  ja_JP: 是否限制城市范围内搜索，默认不限制
+                  pt_BR: 是否限制城市范围内搜索，默认不限制
+                  zh_Hans: 是否限制城市范围内搜索，默认不限制
+                input_schema: null
+                label:
+                  en_US: citylimit
+                  ja_JP: citylimit
+                  pt_BR: citylimit
+                  zh_Hans: citylimit
+                llm_description: 是否限制城市范围内搜索，默认不限制
+                max: null
+                min: null
+                multiple: false
+                name: citylimit
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: boolean
+              settings: {}
+              tool_description: 关键字搜索 API 根据用户输入的关键字进行 POI 搜索，并返回相关的信息
+              tool_label: maps_text_search
+              tool_name: maps_text_search
+              type: mcp
+            - enabled: true
+              extra:
+                description: ''
+              parameters: {}
+              provider_name: amap
+              provider_show_name: 高德地图
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 搜索关键词
+                  ja_JP: 搜索关键词
+                  pt_BR: 搜索关键词
+                  zh_Hans: 搜索关键词
+                input_schema: null
+                label:
+                  en_US: keywords
+                  ja_JP: keywords
+                  pt_BR: keywords
+                  zh_Hans: keywords
+                llm_description: 搜索关键词
+                max: null
+                min: null
+                multiple: false
+                name: keywords
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 中心点经度纬度
+                  ja_JP: 中心点经度纬度
+                  pt_BR: 中心点经度纬度
+                  zh_Hans: 中心点经度纬度
+                input_schema: null
+                label:
+                  en_US: location
+                  ja_JP: location
+                  pt_BR: location
+                  zh_Hans: location
+                llm_description: 中心点经度纬度
+                max: null
+                min: null
+                multiple: false
+                name: location
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 搜索半径
+                  ja_JP: 搜索半径
+                  pt_BR: 搜索半径
+                  zh_Hans: 搜索半径
+                input_schema: null
+                label:
+                  en_US: radius
+                  ja_JP: radius
+                  pt_BR: radius
+                  zh_Hans: radius
+                llm_description: 搜索半径
+                max: null
+                min: null
+                multiple: false
+                name: radius
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 召回策略，0=默认召回策略，1=优先召回扫街榜POI
+                  ja_JP: 召回策略，0=默认召回策略，1=优先召回扫街榜POI
+                  pt_BR: 召回策略，0=默认召回策略，1=优先召回扫街榜POI
+                  zh_Hans: 召回策略，0=默认召回策略，1=优先召回扫街榜POI
+                input_schema: null
+                label:
+                  en_US: strategy
+                  ja_JP: strategy
+                  pt_BR: strategy
+                  zh_Hans: strategy
+                llm_description: 召回策略，0=默认召回策略，1=优先召回扫街榜POI
+                max: null
+                min: null
+                multiple: false
+                name: strategy
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: number
+              settings: {}
+              tool_description: 周边搜，根据用户传入关键词以及坐标location，搜索出radius半径范围的POI
+              tool_label: maps_around_search
+              tool_name: maps_around_search
+              type: mcp
+            - enabled: true
+              extra:
+                description: ''
+              parameters: {}
+              provider_name: amap
+              provider_show_name: 高德地图
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 关键词搜或者周边搜获取到的POI ID
+                  ja_JP: 关键词搜或者周边搜获取到的POI ID
+                  pt_BR: 关键词搜或者周边搜获取到的POI ID
+                  zh_Hans: 关键词搜或者周边搜获取到的POI ID
+                input_schema: null
+                label:
+                  en_US: id
+                  ja_JP: id
+                  pt_BR: id
+                  zh_Hans: id
+                llm_description: 关键词搜或者周边搜获取到的POI ID
+                max: null
+                min: null
+                multiple: false
+                name: id
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              settings: {}
+              tool_description: 查询关键词搜或者周边搜获取到的POI ID的详细信息
+              tool_label: maps_search_detail
+              tool_name: maps_search_detail
+              type: mcp
+            - enabled: true
+              extra:
+                description: ''
+              parameters: {}
+              provider_name: amap
+              provider_show_name: 高德地图
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 出发点经纬度，坐标格式为：经度，纬度
+                  ja_JP: 出发点经纬度，坐标格式为：经度，纬度
+                  pt_BR: 出发点经纬度，坐标格式为：经度，纬度
+                  zh_Hans: 出发点经纬度，坐标格式为：经度，纬度
+                input_schema: null
+                label:
+                  en_US: origin
+                  ja_JP: origin
+                  pt_BR: origin
+                  zh_Hans: origin
+                llm_description: 出发点经纬度，坐标格式为：经度，纬度
+                max: null
+                min: null
+                multiple: false
+                name: origin
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 目的地经纬度，坐标格式为：经度，纬度
+                  ja_JP: 目的地经纬度，坐标格式为：经度，纬度
+                  pt_BR: 目的地经纬度，坐标格式为：经度，纬度
+                  zh_Hans: 目的地经纬度，坐标格式为：经度，纬度
+                input_schema: null
+                label:
+                  en_US: destination
+                  ja_JP: destination
+                  pt_BR: destination
+                  zh_Hans: destination
+                llm_description: 目的地经纬度，坐标格式为：经度，纬度
+                max: null
+                min: null
+                multiple: false
+                name: destination
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 公共交通规划起点城市
+                  ja_JP: 公共交通规划起点城市
+                  pt_BR: 公共交通规划起点城市
+                  zh_Hans: 公共交通规划起点城市
+                input_schema: null
+                label:
+                  en_US: city
+                  ja_JP: city
+                  pt_BR: city
+                  zh_Hans: city
+                llm_description: 公共交通规划起点城市
+                max: null
+                min: null
+                multiple: false
+                name: city
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 公共交通规划终点城市
+                  ja_JP: 公共交通规划终点城市
+                  pt_BR: 公共交通规划终点城市
+                  zh_Hans: 公共交通规划终点城市
+                input_schema: null
+                label:
+                  en_US: cityd
+                  ja_JP: cityd
+                  pt_BR: cityd
+                  zh_Hans: cityd
+                llm_description: 公共交通规划终点城市
+                max: null
+                min: null
+                multiple: false
+                name: cityd
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              settings: {}
+              tool_description: 根据用户起终点经纬度坐标规划综合各类公共（火车、公交、地铁）交通方式的通勤方案，并且返回通勤方案的数据，跨城场景下必须传起点城市与终点城市
+              tool_label: maps_direction_transit_integrated
+              tool_name: maps_direction_transit_integrated
+              type: mcp
+            - enabled: true
+              extra:
+                description: ''
+              parameters: {}
+              provider_name: amap
+              provider_show_name: 高德地图
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 出发点经度，纬度，坐标格式为：经度，纬度
+                  ja_JP: 出发点经度，纬度，坐标格式为：经度，纬度
+                  pt_BR: 出发点经度，纬度，坐标格式为：经度，纬度
+                  zh_Hans: 出发点经度，纬度，坐标格式为：经度，纬度
+                input_schema: null
+                label:
+                  en_US: origin
+                  ja_JP: origin
+                  pt_BR: origin
+                  zh_Hans: origin
+                llm_description: 出发点经度，纬度，坐标格式为：经度，纬度
+                max: null
+                min: null
+                multiple: false
+                name: origin
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 目的地经度，纬度，坐标格式为：经度，纬度
+                  ja_JP: 目的地经度，纬度，坐标格式为：经度，纬度
+                  pt_BR: 目的地经度，纬度，坐标格式为：经度，纬度
+                  zh_Hans: 目的地经度，纬度，坐标格式为：经度，纬度
+                input_schema: null
+                label:
+                  en_US: destination
+                  ja_JP: destination
+                  pt_BR: destination
+                  zh_Hans: destination
+                llm_description: 目的地经度，纬度，坐标格式为：经度，纬度
+                max: null
+                min: null
+                multiple: false
+                name: destination
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              settings: {}
+              tool_description: 根据输入起点终点经纬度坐标规划100km 以内的步行通勤方案，并且返回通勤方案的数据
+              tool_label: maps_direction_walking
+              tool_name: maps_direction_walking
+              type: mcp
+        agent_strategy_label: FunctionCalling
+        agent_strategy_name: function_calling
+        agent_strategy_provider_name: langgenius/agent/agent
+        desc: 高德地图 + 12306 实时查询，生成完整行程单
+        memory:
+          query_prompt_template: '{{#sys.query#}}'
+          window:
+            enabled: true
+            size: 10
+        output_schema: {}
+        plugin_unique_identifier: langgenius/agent:0.0.51@3c6c32e593b33476cb52f4e5aaf1bf23e1c71b3d07ba64d40690e0dbce3a7e34
+        selected: true
         title: 写旅游攻略
-        desc: ''
-        selected: false
-        model:
-          provider: langgenius/tongyi/tongyi
-          name: qwen3.6-plus
-          mode: chat
-          completion_params:
-            temperature: 0.6
-        prompt_template:
-        - id: sys-trip
-          role: system
-          text: |-
-            你是一位耐心、贴心的出行顾问，专门帮老年人规划旅游。今天是{{#today.today#}}。
+        tool_node_version: '2'
+        type: agent
+      height: 232
+      id: trip
+      position:
+        x: 960
+        y: 100
+      positionAbsolute:
+        x: 960
+        y: 100
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 0
+    - data:
+        agent_parameters:
+          instruction:
+            type: mixed
+            value: '你是一位耐心的购票指导员，帮老年人买火车票、高铁票、飞机票。今天是{{#today.today#}}。
 
-            【先问清楚再规划】如果老人没说清楚，先用一两个简单问题问（一次最多问两个）：从哪里出发、想去哪、去几天、几个人、腿脚和身体怎么样。信息够了就直接给方案，不要反复追问。
 
-            【规划原则】
-            - 节奏慢：每天最多 2 个主要景点，中午留出休息时间，晚上不安排远距离活动。
-            - 少走路、少换乘：优先直达交通、有电梯/缆车/观光车的景点，标出步行大概多久。
-            - 每天都写上：附近的医院或药店方向、哪里有厕所和休息的地方。
-            - 提醒老年优惠：很多景区 60 岁或 65 岁以上凭身份证免票或半价，但要提醒以景区公告为准。
-            - 住宿建议：交通方便、有电梯、离医院不远。
-            - 饮食清淡，提醒少吃生冷辛辣。
+              【你能做什么】你不能替老人下单或付款，但可以查实时车次和余票。你要做的是：帮老人想清楚买什么票，再手把手教他们怎么买。
 
-            【回答格式】
-            - 用“第一天 / 第二天”分段，每段 3～5 行，每行一句短话。
-            - 不用英文、不用生僻词，数字说清楚（例如“大约走 10 分钟”）。
-            - 最后用一句话总结，并问老人要不要帮忙查车票或看看出门要带什么。
 
-            【诚实】你没有实时数据，不要编造具体的开放时间、票价、车次。涉及这些就说“大概”，并提醒出发前打电话或在官方渠道确认。
+              【先问清楚】从哪里到哪里、哪天走、几个人、想坐高铁还是飞机。一次最多问两个问题。
+
+
+              【给建议时】
+
+              - 推荐白天出发（上午 9 点到下午 4 点之间）、直达不换乘的车次。
+
+              - 卧铺建议下铺（铁路 12306 对 60 岁以上旅客会优先安排下铺），高铁建议靠过道，方便上厕所。
+
+              - 提醒提前 1 小时到车站，带好身份证。
+
+              - 车次、时刻和票价一律以查到的为准，查不到就直说，不要编造。
+
+
+              【查车次】老人问某天从哪里到哪里的车次时，先用 get-station-code-of-citys 查车站代码，再用 get-tickets
+              查（limitedNum 设为 5，优先上午 8 点到下午 4 点出发的），列出车次、出发和到达时间、历时、二等座价格、是否有票。直达没有票时，可以用
+              get-interline-tickets 查中转。回答里不要出现车站代码。
+
+
+              【到车站怎么走】老人问去火车站或机场怎么走时，用 maps_geo 把出发地和车站转成坐标，再用 maps_direction_transit_integrated
+              查公交地铁路线，用简单的话说清楚坐几路车、在哪站下、大约多久；路线复杂时建议打车。不要在回答里出现工具名称、经纬度这类技术内容。
+
+
+              【教买票，分步骤，每步一行】
+
+              - 火车/高铁：打开“铁路12306”App → 首页点“敬老版”（字大好用）→ 填出发地、目的地、日期 → 查询 → 选车次 → 选乘车人
+              → 提交订单 → 付款。
+
+              - 不会用手机：可以到火车站人工窗口买，或者拨打 12306 客服电话，也可以请子女帮忙在 App 上给您买。
+
+              - 飞机票：建议在航空公司官方 App 或官网买，或请子女帮忙。
+
+
+              【防骗，每次都要提醒一句】
+
+              - 12306 和航空公司不会打电话让您“退票改签”还转账。
+
+              - 不要把身份证号、银行卡号、验证码告诉任何陌生人，包括我。
+
+              如果老人主动发来身份证号、银行卡号或验证码，提醒他们不要发，也不要在回答里重复这些号码。
+
+
+              【回答格式】短句、分步骤、不用英文，最后问一句“需要我再说一遍哪一步吗？”
+
+
+              【工作方式】需要查天气、地点、路线时，先调用工具，全部查完后再一次性回答；调用工具之前不要输出任何文字，不要说“正在查询”。路线、地址、天气一律以工具查到的为准，不要凭记忆回答。'
+          maximum_iterations:
+            type: constant
+            value: 6
+          model:
+            type: constant
+            value:
+              completion_params:
+                temperature: 0.3
+                thinking: false
+              mode: chat
+              model: deepseek-v4-flash
+              model_type: llm
+              provider: langgenius/deepseek/deepseek
+              type: model-selector
+          query:
+            type: mixed
+            value: '{{#sys.query#}}'
+          tools:
+            type: constant
+            value:
+            - enabled: true
+              extra:
+                description: ''
+              parameters: {}
+              provider_name: train12306
+              provider_show_name: 12306查票
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 要查询的城市，比如"北京"。若要查询多个城市，请用|分割，比如"北京|上海"。
+                  ja_JP: 要查询的城市，比如"北京"。若要查询多个城市，请用|分割，比如"北京|上海"。
+                  pt_BR: 要查询的城市，比如"北京"。若要查询多个城市，请用|分割，比如"北京|上海"。
+                  zh_Hans: 要查询的城市，比如"北京"。若要查询多个城市，请用|分割，比如"北京|上海"。
+                input_schema: null
+                label:
+                  en_US: citys
+                  ja_JP: citys
+                  pt_BR: citys
+                  zh_Hans: citys
+                llm_description: 要查询的城市，比如"北京"。若要查询多个城市，请用|分割，比如"北京|上海"。
+                max: null
+                min: null
+                multiple: false
+                name: citys
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              settings: {}
+              tool_description: 通过中文城市名查询代表该城市的 `station_code`。
+              tool_label: get-station-code-of-citys
+              tool_name: get-station-code-of-citys
+              type: mcp
+            - enabled: true
+              extra:
+                description: ''
+              parameters: {}
+              provider_name: train12306
+              provider_show_name: 12306查票
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 查询日期，格式为 "yyyy-MM-dd"。如果用户提供的是相对日期（如“明天”），请务必先调用 `get-current-date`
+                    接口获取当前日期，并计算出目标日期。
+                  ja_JP: 查询日期，格式为 "yyyy-MM-dd"。如果用户提供的是相对日期（如“明天”），请务必先调用 `get-current-date`
+                    接口获取当前日期，并计算出目标日期。
+                  pt_BR: 查询日期，格式为 "yyyy-MM-dd"。如果用户提供的是相对日期（如“明天”），请务必先调用 `get-current-date`
+                    接口获取当前日期，并计算出目标日期。
+                  zh_Hans: 查询日期，格式为 "yyyy-MM-dd"。如果用户提供的是相对日期（如“明天”），请务必先调用 `get-current-date`
+                    接口获取当前日期，并计算出目标日期。
+                input_schema: null
+                label:
+                  en_US: date
+                  ja_JP: date
+                  pt_BR: date
+                  zh_Hans: date
+                llm_description: 查询日期，格式为 "yyyy-MM-dd"。如果用户提供的是相对日期（如“明天”），请务必先调用
+                  `get-current-date` 接口获取当前日期，并计算出目标日期。
+                max: null
+                min: null
+                multiple: false
+                name: date
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 出发地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                  ja_JP: 出发地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                  pt_BR: 出发地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                  zh_Hans: 出发地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                input_schema: null
+                label:
+                  en_US: fromStation
+                  ja_JP: fromStation
+                  pt_BR: fromStation
+                  zh_Hans: fromStation
+                llm_description: 出发地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                  或 `get-station-code-of-citys` 接口查询得到）
+                max: null
+                min: null
+                multiple: false
+                name: fromStation
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 到达地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                  ja_JP: 到达地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                  pt_BR: 到达地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                  zh_Hans: 到达地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                input_schema: null
+                label:
+                  en_US: toStation
+                  ja_JP: toStation
+                  pt_BR: toStation
+                  zh_Hans: toStation
+                llm_description: 到达地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                  或 `get-station-code-of-citys` 接口查询得到）
+                max: null
+                min: null
+                multiple: false
+                name: toStation
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 车次筛选条件，默认为空，即不筛选。支持多个标志同时筛选。例如用户说“高铁票”，则应使用 "G"。可选标志：[G(高铁/城际),D(动车),Z(直达特快),T(特快),K(快速),O(其他),F(复兴号),S(智能动车组)]
+                  ja_JP: 车次筛选条件，默认为空，即不筛选。支持多个标志同时筛选。例如用户说“高铁票”，则应使用 "G"。可选标志：[G(高铁/城际),D(动车),Z(直达特快),T(特快),K(快速),O(其他),F(复兴号),S(智能动车组)]
+                  pt_BR: 车次筛选条件，默认为空，即不筛选。支持多个标志同时筛选。例如用户说“高铁票”，则应使用 "G"。可选标志：[G(高铁/城际),D(动车),Z(直达特快),T(特快),K(快速),O(其他),F(复兴号),S(智能动车组)]
+                  zh_Hans: 车次筛选条件，默认为空，即不筛选。支持多个标志同时筛选。例如用户说“高铁票”，则应使用 "G"。可选标志：[G(高铁/城际),D(动车),Z(直达特快),T(特快),K(快速),O(其他),F(复兴号),S(智能动车组)]
+                input_schema: null
+                label:
+                  en_US: trainFilterFlags
+                  ja_JP: trainFilterFlags
+                  pt_BR: trainFilterFlags
+                  zh_Hans: trainFilterFlags
+                llm_description: 车次筛选条件，默认为空，即不筛选。支持多个标志同时筛选。例如用户说“高铁票”，则应使用 "G"。可选标志：[G(高铁/城际),D(动车),Z(直达特快),T(特快),K(快速),O(其他),F(复兴号),S(智能动车组)]
+                max: null
+                min: null
+                multiple: false
+                name: trainFilterFlags
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 最早出发时间（0-24），默认为0。
+                  ja_JP: 最早出发时间（0-24），默认为0。
+                  pt_BR: 最早出发时间（0-24），默认为0。
+                  zh_Hans: 最早出发时间（0-24），默认为0。
+                input_schema: null
+                label:
+                  en_US: earliestStartTime
+                  ja_JP: earliestStartTime
+                  pt_BR: earliestStartTime
+                  zh_Hans: earliestStartTime
+                llm_description: 最早出发时间（0-24），默认为0。
+                max: null
+                min: null
+                multiple: false
+                name: earliestStartTime
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: number
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 最迟出发时间（0-24），默认为24。
+                  ja_JP: 最迟出发时间（0-24），默认为24。
+                  pt_BR: 最迟出发时间（0-24），默认为24。
+                  zh_Hans: 最迟出发时间（0-24），默认为24。
+                input_schema: null
+                label:
+                  en_US: latestStartTime
+                  ja_JP: latestStartTime
+                  pt_BR: latestStartTime
+                  zh_Hans: latestStartTime
+                llm_description: 最迟出发时间（0-24），默认为24。
+                max: null
+                min: null
+                multiple: false
+                name: latestStartTime
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: number
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 排序方式，默认为空，即不排序。仅支持单一标识。可选标志：[startTime(出发时间从早到晚), arriveTime(抵达时间从早到晚),
+                    duration(历时从短到长)]
+                  ja_JP: 排序方式，默认为空，即不排序。仅支持单一标识。可选标志：[startTime(出发时间从早到晚), arriveTime(抵达时间从早到晚),
+                    duration(历时从短到长)]
+                  pt_BR: 排序方式，默认为空，即不排序。仅支持单一标识。可选标志：[startTime(出发时间从早到晚), arriveTime(抵达时间从早到晚),
+                    duration(历时从短到长)]
+                  zh_Hans: 排序方式，默认为空，即不排序。仅支持单一标识。可选标志：[startTime(出发时间从早到晚), arriveTime(抵达时间从早到晚),
+                    duration(历时从短到长)]
+                input_schema: null
+                label:
+                  en_US: sortFlag
+                  ja_JP: sortFlag
+                  pt_BR: sortFlag
+                  zh_Hans: sortFlag
+                llm_description: 排序方式，默认为空，即不排序。仅支持单一标识。可选标志：[startTime(出发时间从早到晚),
+                  arriveTime(抵达时间从早到晚), duration(历时从短到长)]
+                max: null
+                min: null
+                multiple: false
+                name: sortFlag
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 是否逆向排序结果，默认为false。仅在设置了sortFlag时生效。
+                  ja_JP: 是否逆向排序结果，默认为false。仅在设置了sortFlag时生效。
+                  pt_BR: 是否逆向排序结果，默认为false。仅在设置了sortFlag时生效。
+                  zh_Hans: 是否逆向排序结果，默认为false。仅在设置了sortFlag时生效。
+                input_schema: null
+                label:
+                  en_US: sortReverse
+                  ja_JP: sortReverse
+                  pt_BR: sortReverse
+                  zh_Hans: sortReverse
+                llm_description: 是否逆向排序结果，默认为false。仅在设置了sortFlag时生效。
+                max: null
+                min: null
+                multiple: false
+                name: sortReverse
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: boolean
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 返回的余票数量限制，默认为0，即不限制。
+                  ja_JP: 返回的余票数量限制，默认为0，即不限制。
+                  pt_BR: 返回的余票数量限制，默认为0，即不限制。
+                  zh_Hans: 返回的余票数量限制，默认为0，即不限制。
+                input_schema: null
+                label:
+                  en_US: limitedNum
+                  ja_JP: limitedNum
+                  pt_BR: limitedNum
+                  zh_Hans: limitedNum
+                llm_description: 返回的余票数量限制，默认为0，即不限制。
+                max: null
+                min: null
+                multiple: false
+                name: limitedNum
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: number
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 返回结果格式，默认为text，建议使用text与csv。可选标志：[text, csv, json]
+                  ja_JP: 返回结果格式，默认为text，建议使用text与csv。可选标志：[text, csv, json]
+                  pt_BR: 返回结果格式，默认为text，建议使用text与csv。可选标志：[text, csv, json]
+                  zh_Hans: 返回结果格式，默认为text，建议使用text与csv。可选标志：[text, csv, json]
+                input_schema: null
+                label:
+                  en_US: format
+                  ja_JP: format
+                  pt_BR: format
+                  zh_Hans: format
+                llm_description: 返回结果格式，默认为text，建议使用text与csv。可选标志：[text, csv, json]
+                max: null
+                min: null
+                multiple: false
+                name: format
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              settings: {}
+              tool_description: 查询12306余票信息。
+              tool_label: get-tickets
+              tool_name: get-tickets
+              type: mcp
+            - enabled: true
+              extra:
+                description: ''
+              parameters: {}
+              provider_name: train12306
+              provider_show_name: 12306查票
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 查询日期，格式为 "yyyy-MM-dd"。如果用户提供的是相对日期（如“明天”），请务必先调用 `get-current-date`
+                    接口获取当前日期，并计算出目标日期。
+                  ja_JP: 查询日期，格式为 "yyyy-MM-dd"。如果用户提供的是相对日期（如“明天”），请务必先调用 `get-current-date`
+                    接口获取当前日期，并计算出目标日期。
+                  pt_BR: 查询日期，格式为 "yyyy-MM-dd"。如果用户提供的是相对日期（如“明天”），请务必先调用 `get-current-date`
+                    接口获取当前日期，并计算出目标日期。
+                  zh_Hans: 查询日期，格式为 "yyyy-MM-dd"。如果用户提供的是相对日期（如“明天”），请务必先调用 `get-current-date`
+                    接口获取当前日期，并计算出目标日期。
+                input_schema: null
+                label:
+                  en_US: date
+                  ja_JP: date
+                  pt_BR: date
+                  zh_Hans: date
+                llm_description: 查询日期，格式为 "yyyy-MM-dd"。如果用户提供的是相对日期（如“明天”），请务必先调用
+                  `get-current-date` 接口获取当前日期，并计算出目标日期。
+                max: null
+                min: null
+                multiple: false
+                name: date
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 出发地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                  ja_JP: 出发地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                  pt_BR: 出发地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                  zh_Hans: 出发地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                input_schema: null
+                label:
+                  en_US: fromStation
+                  ja_JP: fromStation
+                  pt_BR: fromStation
+                  zh_Hans: fromStation
+                llm_description: 出发地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                  或 `get-station-code-of-citys` 接口查询得到）
+                max: null
+                min: null
+                multiple: false
+                name: fromStation
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 到达地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                  ja_JP: 到达地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                  pt_BR: 到达地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                  zh_Hans: 到达地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）
+                input_schema: null
+                label:
+                  en_US: toStation
+                  ja_JP: toStation
+                  pt_BR: toStation
+                  zh_Hans: toStation
+                llm_description: 到达地的中文名或站点的 `station_code`（可通过 `get-station-code-by-names`
+                  或 `get-station-code-of-citys` 接口查询得到）
+                max: null
+                min: null
+                multiple: false
+                name: toStation
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 中转地的中文或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）。该参数可选。
+                  ja_JP: 中转地的中文或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）。该参数可选。
+                  pt_BR: 中转地的中文或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）。该参数可选。
+                  zh_Hans: 中转地的中文或站点的 `station_code`（可通过 `get-station-code-by-names`
+                    或 `get-station-code-of-citys` 接口查询得到）。该参数可选。
+                input_schema: null
+                label:
+                  en_US: middleStation
+                  ja_JP: middleStation
+                  pt_BR: middleStation
+                  zh_Hans: middleStation
+                llm_description: 中转地的中文或站点的 `station_code`（可通过 `get-station-code-by-names`
+                  或 `get-station-code-of-citys` 接口查询得到）。该参数可选。
+                max: null
+                min: null
+                multiple: false
+                name: middleStation
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 是否显示无座车，默认不显示无座车。
+                  ja_JP: 是否显示无座车，默认不显示无座车。
+                  pt_BR: 是否显示无座车，默认不显示无座车。
+                  zh_Hans: 是否显示无座车，默认不显示无座车。
+                input_schema: null
+                label:
+                  en_US: showWZ
+                  ja_JP: showWZ
+                  pt_BR: showWZ
+                  zh_Hans: showWZ
+                llm_description: 是否显示无座车，默认不显示无座车。
+                max: null
+                min: null
+                multiple: false
+                name: showWZ
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: boolean
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 车次筛选条件，默认为空。从以下标志中选取多个条件组合[G(高铁/城际),D(动车),Z(直达特快),T(特快),K(快速),O(其他),F(复兴号),S(智能动车组)]
+                  ja_JP: 车次筛选条件，默认为空。从以下标志中选取多个条件组合[G(高铁/城际),D(动车),Z(直达特快),T(特快),K(快速),O(其他),F(复兴号),S(智能动车组)]
+                  pt_BR: 车次筛选条件，默认为空。从以下标志中选取多个条件组合[G(高铁/城际),D(动车),Z(直达特快),T(特快),K(快速),O(其他),F(复兴号),S(智能动车组)]
+                  zh_Hans: 车次筛选条件，默认为空。从以下标志中选取多个条件组合[G(高铁/城际),D(动车),Z(直达特快),T(特快),K(快速),O(其他),F(复兴号),S(智能动车组)]
+                input_schema: null
+                label:
+                  en_US: trainFilterFlags
+                  ja_JP: trainFilterFlags
+                  pt_BR: trainFilterFlags
+                  zh_Hans: trainFilterFlags
+                llm_description: 车次筛选条件，默认为空。从以下标志中选取多个条件组合[G(高铁/城际),D(动车),Z(直达特快),T(特快),K(快速),O(其他),F(复兴号),S(智能动车组)]
+                max: null
+                min: null
+                multiple: false
+                name: trainFilterFlags
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 最早出发时间（0-24），默认为0。
+                  ja_JP: 最早出发时间（0-24），默认为0。
+                  pt_BR: 最早出发时间（0-24），默认为0。
+                  zh_Hans: 最早出发时间（0-24），默认为0。
+                input_schema: null
+                label:
+                  en_US: earliestStartTime
+                  ja_JP: earliestStartTime
+                  pt_BR: earliestStartTime
+                  zh_Hans: earliestStartTime
+                llm_description: 最早出发时间（0-24），默认为0。
+                max: null
+                min: null
+                multiple: false
+                name: earliestStartTime
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: number
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 最迟出发时间（0-24），默认为24。
+                  ja_JP: 最迟出发时间（0-24），默认为24。
+                  pt_BR: 最迟出发时间（0-24），默认为24。
+                  zh_Hans: 最迟出发时间（0-24），默认为24。
+                input_schema: null
+                label:
+                  en_US: latestStartTime
+                  ja_JP: latestStartTime
+                  pt_BR: latestStartTime
+                  zh_Hans: latestStartTime
+                llm_description: 最迟出发时间（0-24），默认为24。
+                max: null
+                min: null
+                multiple: false
+                name: latestStartTime
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: number
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 排序方式，默认为空，即不排序。仅支持单一标识。可选标志：[startTime(出发时间从早到晚), arriveTime(抵达时间从早到晚),
+                    duration(历时从短到长)]
+                  ja_JP: 排序方式，默认为空，即不排序。仅支持单一标识。可选标志：[startTime(出发时间从早到晚), arriveTime(抵达时间从早到晚),
+                    duration(历时从短到长)]
+                  pt_BR: 排序方式，默认为空，即不排序。仅支持单一标识。可选标志：[startTime(出发时间从早到晚), arriveTime(抵达时间从早到晚),
+                    duration(历时从短到长)]
+                  zh_Hans: 排序方式，默认为空，即不排序。仅支持单一标识。可选标志：[startTime(出发时间从早到晚), arriveTime(抵达时间从早到晚),
+                    duration(历时从短到长)]
+                input_schema: null
+                label:
+                  en_US: sortFlag
+                  ja_JP: sortFlag
+                  pt_BR: sortFlag
+                  zh_Hans: sortFlag
+                llm_description: 排序方式，默认为空，即不排序。仅支持单一标识。可选标志：[startTime(出发时间从早到晚),
+                  arriveTime(抵达时间从早到晚), duration(历时从短到长)]
+                max: null
+                min: null
+                multiple: false
+                name: sortFlag
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 是否逆向排序结果，默认为false。仅在设置了sortFlag时生效。
+                  ja_JP: 是否逆向排序结果，默认为false。仅在设置了sortFlag时生效。
+                  pt_BR: 是否逆向排序结果，默认为false。仅在设置了sortFlag时生效。
+                  zh_Hans: 是否逆向排序结果，默认为false。仅在设置了sortFlag时生效。
+                input_schema: null
+                label:
+                  en_US: sortReverse
+                  ja_JP: sortReverse
+                  pt_BR: sortReverse
+                  zh_Hans: sortReverse
+                llm_description: 是否逆向排序结果，默认为false。仅在设置了sortFlag时生效。
+                max: null
+                min: null
+                multiple: false
+                name: sortReverse
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: boolean
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 返回的中转余票数量限制，默认为10。
+                  ja_JP: 返回的中转余票数量限制，默认为10。
+                  pt_BR: 返回的中转余票数量限制，默认为10。
+                  zh_Hans: 返回的中转余票数量限制，默认为10。
+                input_schema: null
+                label:
+                  en_US: limitedNum
+                  ja_JP: limitedNum
+                  pt_BR: limitedNum
+                  zh_Hans: limitedNum
+                llm_description: 返回的中转余票数量限制，默认为10。
+                max: null
+                min: null
+                multiple: false
+                name: limitedNum
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: number
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 返回结果格式，默认为text，建议使用text。可选标志：[text, json]
+                  ja_JP: 返回结果格式，默认为text，建议使用text。可选标志：[text, json]
+                  pt_BR: 返回结果格式，默认为text，建议使用text。可选标志：[text, json]
+                  zh_Hans: 返回结果格式，默认为text，建议使用text。可选标志：[text, json]
+                input_schema: null
+                label:
+                  en_US: format
+                  ja_JP: format
+                  pt_BR: format
+                  zh_Hans: format
+                llm_description: 返回结果格式，默认为text，建议使用text。可选标志：[text, json]
+                max: null
+                min: null
+                multiple: false
+                name: format
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              settings: {}
+              tool_description: 查询12306中转余票信息。尚且只支持查询前十条。
+              tool_label: get-interline-tickets
+              tool_name: get-interline-tickets
+              type: mcp
+            - enabled: true
+              extra:
+                description: ''
+              parameters: {}
+              provider_name: amap
+              provider_show_name: 高德地图
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 待解析的结构化地址信息
+                  ja_JP: 待解析的结构化地址信息
+                  pt_BR: 待解析的结构化地址信息
+                  zh_Hans: 待解析的结构化地址信息
+                input_schema: null
+                label:
+                  en_US: address
+                  ja_JP: address
+                  pt_BR: address
+                  zh_Hans: address
+                llm_description: 待解析的结构化地址信息
+                max: null
+                min: null
+                multiple: false
+                name: address
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 指定查询的城市
+                  ja_JP: 指定查询的城市
+                  pt_BR: 指定查询的城市
+                  zh_Hans: 指定查询的城市
+                input_schema: null
+                label:
+                  en_US: city
+                  ja_JP: city
+                  pt_BR: city
+                  zh_Hans: city
+                llm_description: 指定查询的城市
+                max: null
+                min: null
+                multiple: false
+                name: city
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              settings: {}
+              tool_description: 将详细的结构化地址转换为经纬度坐标。支持对地标性名胜景区、建筑物名称解析为经纬度坐标
+              tool_label: maps_geo
+              tool_name: maps_geo
+              type: mcp
+            - enabled: true
+              extra:
+                description: ''
+              parameters: {}
+              provider_name: amap
+              provider_show_name: 高德地图
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 查询关键字
+                  ja_JP: 查询关键字
+                  pt_BR: 查询关键字
+                  zh_Hans: 查询关键字
+                input_schema: null
+                label:
+                  en_US: keywords
+                  ja_JP: keywords
+                  pt_BR: keywords
+                  zh_Hans: keywords
+                llm_description: 查询关键字
+                max: null
+                min: null
+                multiple: false
+                name: keywords
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 查询城市
+                  ja_JP: 查询城市
+                  pt_BR: 查询城市
+                  zh_Hans: 查询城市
+                input_schema: null
+                label:
+                  en_US: city
+                  ja_JP: city
+                  pt_BR: city
+                  zh_Hans: city
+                llm_description: 查询城市
+                max: null
+                min: null
+                multiple: false
+                name: city
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 是否限制城市范围内搜索，默认不限制
+                  ja_JP: 是否限制城市范围内搜索，默认不限制
+                  pt_BR: 是否限制城市范围内搜索，默认不限制
+                  zh_Hans: 是否限制城市范围内搜索，默认不限制
+                input_schema: null
+                label:
+                  en_US: citylimit
+                  ja_JP: citylimit
+                  pt_BR: citylimit
+                  zh_Hans: citylimit
+                llm_description: 是否限制城市范围内搜索，默认不限制
+                max: null
+                min: null
+                multiple: false
+                name: citylimit
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: boolean
+              settings: {}
+              tool_description: 关键字搜索 API 根据用户输入的关键字进行 POI 搜索，并返回相关的信息
+              tool_label: maps_text_search
+              tool_name: maps_text_search
+              type: mcp
+            - enabled: true
+              extra:
+                description: ''
+              parameters: {}
+              provider_name: amap
+              provider_show_name: 高德地图
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 出发点经纬度，坐标格式为：经度，纬度
+                  ja_JP: 出发点经纬度，坐标格式为：经度，纬度
+                  pt_BR: 出发点经纬度，坐标格式为：经度，纬度
+                  zh_Hans: 出发点经纬度，坐标格式为：经度，纬度
+                input_schema: null
+                label:
+                  en_US: origin
+                  ja_JP: origin
+                  pt_BR: origin
+                  zh_Hans: origin
+                llm_description: 出发点经纬度，坐标格式为：经度，纬度
+                max: null
+                min: null
+                multiple: false
+                name: origin
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 目的地经纬度，坐标格式为：经度，纬度
+                  ja_JP: 目的地经纬度，坐标格式为：经度，纬度
+                  pt_BR: 目的地经纬度，坐标格式为：经度，纬度
+                  zh_Hans: 目的地经纬度，坐标格式为：经度，纬度
+                input_schema: null
+                label:
+                  en_US: destination
+                  ja_JP: destination
+                  pt_BR: destination
+                  zh_Hans: destination
+                llm_description: 目的地经纬度，坐标格式为：经度，纬度
+                max: null
+                min: null
+                multiple: false
+                name: destination
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 公共交通规划起点城市
+                  ja_JP: 公共交通规划起点城市
+                  pt_BR: 公共交通规划起点城市
+                  zh_Hans: 公共交通规划起点城市
+                input_schema: null
+                label:
+                  en_US: city
+                  ja_JP: city
+                  pt_BR: city
+                  zh_Hans: city
+                llm_description: 公共交通规划起点城市
+                max: null
+                min: null
+                multiple: false
+                name: city
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 公共交通规划终点城市
+                  ja_JP: 公共交通规划终点城市
+                  pt_BR: 公共交通规划终点城市
+                  zh_Hans: 公共交通规划终点城市
+                input_schema: null
+                label:
+                  en_US: cityd
+                  ja_JP: cityd
+                  pt_BR: cityd
+                  zh_Hans: cityd
+                llm_description: 公共交通规划终点城市
+                max: null
+                min: null
+                multiple: false
+                name: cityd
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              settings: {}
+              tool_description: 根据用户起终点经纬度坐标规划综合各类公共（火车、公交、地铁）交通方式的通勤方案，并且返回通勤方案的数据，跨城场景下必须传起点城市与终点城市
+              tool_label: maps_direction_transit_integrated
+              tool_name: maps_direction_transit_integrated
+              type: mcp
+        agent_strategy_label: FunctionCalling
+        agent_strategy_name: function_calling
+        agent_strategy_provider_name: langgenius/agent/agent
+        desc: 高德地图 + 12306 实时查询
         memory:
+          query_prompt_template: '{{#sys.query#}}'
           window:
             enabled: true
             size: 10
-          query_prompt_template: '{{#sys.query#}}'
-          role_prefix:
-            user: ''
-            assistant: ''
-        context:
-          enabled: false
-          variable_selector: []
-        vision:
-          enabled: false
-        variables: []
-    - id: ticket
-      type: custom
-      position: {x: 960, y: 260}
-      positionAbsolute: {x: 960, y: 260}
-      width: 244
-      height: 98
-      selected: false
-      sourcePosition: right
-      targetPosition: left
-      data:
-        type: llm
+        output_schema: {}
+        plugin_unique_identifier: langgenius/agent:0.0.51@3c6c32e593b33476cb52f4e5aaf1bf23e1c71b3d07ba64d40690e0dbce3a7e34
+        selected: false
         title: 查票买票指导
-        desc: ''
-        selected: false
-        model:
-          provider: langgenius/tongyi/tongyi
-          name: qwen3.6-plus
-          mode: chat
-          completion_params:
-            temperature: 0.3
-        prompt_template:
-        - id: sys-ticket
-          role: system
-          text: |-
-            你是一位耐心的购票指导员，帮老年人买火车票、高铁票、飞机票。今天是{{#today.today#}}。
-
-            【你能做什么】你不能替老人下单或付款，也查不到实时余票。你要做的是：帮老人想清楚买什么票，再手把手教他们怎么买。
-
-            【先问清楚】从哪里到哪里、哪天走、几个人、想坐高铁还是飞机。一次最多问两个问题。
-
-            【给建议时】
-            - 推荐白天出发（上午 9 点到下午 4 点之间）、直达不换乘的车次。
-            - 卧铺建议下铺（铁路 12306 对 60 岁以上旅客会优先安排下铺），高铁建议靠过道，方便上厕所。
-            - 提醒提前 1 小时到车站，带好身份证。
-            - 不要编造具体车次、时刻和票价，只能说“一般有……，具体以 12306 查到的为准”。
-
-            【教买票，分步骤，每步一行】
-            - 火车/高铁：打开“铁路12306”App → 首页点“敬老版”（字大好用）→ 填出发地、目的地、日期 → 查询 → 选车次 → 选乘车人 → 提交订单 → 付款。
-            - 不会用手机：可以到火车站人工窗口买，或者拨打 12306 客服电话，也可以请子女帮忙在 App 上给您买。
-            - 飞机票：建议在航空公司官方 App 或官网买，或请子女帮忙。
-
-            【防骗，每次都要提醒一句】
-            - 12306 和航空公司不会打电话让您“退票改签”还转账。
-            - 不要把身份证号、银行卡号、验证码告诉任何陌生人，包括我。
-            如果老人主动发来身份证号、银行卡号或验证码，提醒他们不要发，也不要在回答里重复这些号码。
-
-            【回答格式】短句、分步骤、不用英文，最后问一句“需要我再说一遍哪一步吗？”
-        memory:
-          window:
-            enabled: true
-            size: 10
-          query_prompt_template: '{{#sys.query#}}'
-          role_prefix:
-            user: ''
-            assistant: ''
-        context:
-          enabled: false
-          variable_selector: []
-        vision:
-          enabled: false
-        variables: []
-    - id: health
-      type: custom
-      position: {x: 960, y: 420}
-      positionAbsolute: {x: 960, y: 420}
-      width: 244
-      height: 98
+        tool_node_version: '2'
+        type: agent
+      height: 216
+      id: ticket
+      position:
+        x: 960
+        y: 260
+      positionAbsolute:
+        x: 960
+        y: 260
       selected: false
       sourcePosition: right
       targetPosition: left
-      data:
-        type: llm
+      type: custom
+      width: 242
+      zIndex: 0
+    - data:
+        agent_parameters:
+          instruction:
+            type: mixed
+            value: '你是一位细心的出行健康顾问，帮老年人做好出门前的准备。今天是{{#today.today#}}。
+
+
+              - 根据老人说的身体情况（高血压、糖尿病、心脏病、腿脚不便等）和目的地、季节，给出具体可做的建议：带什么药、怎么穿、哪些活动要避免。
+
+              - 给一个“出门清单”：身份证、常用药（多带几天的量）、病历或用药单、老花镜、充电宝、紧急联系人电话写在纸上放口袋里。
+
+              - 老人说了目的地时，用 maps_weather 查当地未来几天的真实天气，按天气给穿衣、防晒、防寒建议。
+
+              - 老人问附近医院或药店时，先用 maps_geo 找到位置，再用 maps_around_search 查附近的医院、药店，列出名字和地址。
+
+              - 不要在回答里出现工具名称、经纬度这类技术内容。
+
+              - 你不是医生：涉及换药、调整剂量、能不能去高原等问题，要建议先问自己的医生。
+
+              - 如果老人说现在胸痛、喘不上气、头晕得厉害、突然说话不清楚，第一句话就让他们马上拨打 120 或请身边的人帮忙，不要先讲别的。
+
+
+              回答用短句，分条列出，每条一句话，不用英文和专业术语。
+
+
+              【工作方式】需要查天气、地点、路线时，先调用工具，全部查完后再一次性回答；调用工具之前不要输出任何文字，不要说“正在查询”。路线、地址、天气一律以工具查到的为准，不要凭记忆回答。查到附近医院或药店时，列出最近的
+              2～3 家，写名字和地址。'
+          maximum_iterations:
+            type: constant
+            value: 5
+          model:
+            type: constant
+            value:
+              completion_params:
+                temperature: 0.3
+                thinking: false
+              mode: chat
+              model: deepseek-v4-flash
+              model_type: llm
+              provider: langgenius/deepseek/deepseek
+              type: model-selector
+          query:
+            type: mixed
+            value: '{{#sys.query#}}'
+          tools:
+            type: constant
+            value:
+            - enabled: true
+              extra:
+                description: ''
+              parameters: {}
+              provider_name: amap
+              provider_show_name: 高德地图
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 城市名称或者adcode
+                  ja_JP: 城市名称或者adcode
+                  pt_BR: 城市名称或者adcode
+                  zh_Hans: 城市名称或者adcode
+                input_schema: null
+                label:
+                  en_US: city
+                  ja_JP: city
+                  pt_BR: city
+                  zh_Hans: city
+                llm_description: 城市名称或者adcode
+                max: null
+                min: null
+                multiple: false
+                name: city
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              settings: {}
+              tool_description: 根据城市名称或者标准adcode查询指定城市的天气
+              tool_label: maps_weather
+              tool_name: maps_weather
+              type: mcp
+            - enabled: true
+              extra:
+                description: ''
+              parameters: {}
+              provider_name: amap
+              provider_show_name: 高德地图
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 待解析的结构化地址信息
+                  ja_JP: 待解析的结构化地址信息
+                  pt_BR: 待解析的结构化地址信息
+                  zh_Hans: 待解析的结构化地址信息
+                input_schema: null
+                label:
+                  en_US: address
+                  ja_JP: address
+                  pt_BR: address
+                  zh_Hans: address
+                llm_description: 待解析的结构化地址信息
+                max: null
+                min: null
+                multiple: false
+                name: address
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 指定查询的城市
+                  ja_JP: 指定查询的城市
+                  pt_BR: 指定查询的城市
+                  zh_Hans: 指定查询的城市
+                input_schema: null
+                label:
+                  en_US: city
+                  ja_JP: city
+                  pt_BR: city
+                  zh_Hans: city
+                llm_description: 指定查询的城市
+                max: null
+                min: null
+                multiple: false
+                name: city
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              settings: {}
+              tool_description: 将详细的结构化地址转换为经纬度坐标。支持对地标性名胜景区、建筑物名称解析为经纬度坐标
+              tool_label: maps_geo
+              tool_name: maps_geo
+              type: mcp
+            - enabled: true
+              extra:
+                description: ''
+              parameters: {}
+              provider_name: amap
+              provider_show_name: 高德地图
+              schemas:
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 搜索关键词
+                  ja_JP: 搜索关键词
+                  pt_BR: 搜索关键词
+                  zh_Hans: 搜索关键词
+                input_schema: null
+                label:
+                  en_US: keywords
+                  ja_JP: keywords
+                  pt_BR: keywords
+                  zh_Hans: keywords
+                llm_description: 搜索关键词
+                max: null
+                min: null
+                multiple: false
+                name: keywords
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 中心点经度纬度
+                  ja_JP: 中心点经度纬度
+                  pt_BR: 中心点经度纬度
+                  zh_Hans: 中心点经度纬度
+                input_schema: null
+                label:
+                  en_US: location
+                  ja_JP: location
+                  pt_BR: location
+                  zh_Hans: location
+                llm_description: 中心点经度纬度
+                max: null
+                min: null
+                multiple: false
+                name: location
+                options: []
+                placeholder: null
+                precision: null
+                required: true
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 搜索半径
+                  ja_JP: 搜索半径
+                  pt_BR: 搜索半径
+                  zh_Hans: 搜索半径
+                input_schema: null
+                label:
+                  en_US: radius
+                  ja_JP: radius
+                  pt_BR: radius
+                  zh_Hans: radius
+                llm_description: 搜索半径
+                max: null
+                min: null
+                multiple: false
+                name: radius
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: string
+              - auto_generate: null
+                default: null
+                form: llm
+                human_description:
+                  en_US: 召回策略，0=默认召回策略，1=优先召回扫街榜POI
+                  ja_JP: 召回策略，0=默认召回策略，1=优先召回扫街榜POI
+                  pt_BR: 召回策略，0=默认召回策略，1=优先召回扫街榜POI
+                  zh_Hans: 召回策略，0=默认召回策略，1=优先召回扫街榜POI
+                input_schema: null
+                label:
+                  en_US: strategy
+                  ja_JP: strategy
+                  pt_BR: strategy
+                  zh_Hans: strategy
+                llm_description: 召回策略，0=默认召回策略，1=优先召回扫街榜POI
+                max: null
+                min: null
+                multiple: false
+                name: strategy
+                options: []
+                placeholder: null
+                precision: null
+                required: false
+                scope: null
+                template: null
+                type: number
+              settings: {}
+              tool_description: 周边搜，根据用户传入关键词以及坐标location，搜索出radius半径范围的POI
+              tool_label: maps_around_search
+              tool_name: maps_around_search
+              type: mcp
+        agent_strategy_label: FunctionCalling
+        agent_strategy_name: function_calling
+        agent_strategy_provider_name: langgenius/agent/agent
+        desc: 可调用高德地图实时查询
+        memory:
+          query_prompt_template: '{{#sys.query#}}'
+          window:
+            enabled: true
+            size: 10
+        output_schema: {}
+        plugin_unique_identifier: langgenius/agent:0.0.51@3c6c32e593b33476cb52f4e5aaf1bf23e1c71b3d07ba64d40690e0dbce3a7e34
+        selected: false
         title: 出行健康提醒
-        desc: ''
-        selected: false
-        model:
-          provider: langgenius/tongyi/tongyi
-          name: qwen3.6-plus
-          mode: chat
-          completion_params:
-            temperature: 0.3
-        prompt_template:
-        - id: sys-health
-          role: system
-          text: |-
-            你是一位细心的出行健康顾问，帮老年人做好出门前的准备。今天是{{#today.today#}}。
-
-            - 根据老人说的身体情况（高血压、糖尿病、心脏病、腿脚不便等）和目的地、季节，给出具体可做的建议：带什么药、怎么穿、哪些活动要避免。
-            - 给一个“出门清单”：身份证、常用药（多带几天的量）、病历或用药单、老花镜、充电宝、紧急联系人电话写在纸上放口袋里。
-            - 你查不到实时天气，只能按季节和地方说一般情况，并提醒出发前看天气预报。
-            - 你不是医生：涉及换药、调整剂量、能不能去高原等问题，要建议先问自己的医生。
-            - 如果老人说现在胸痛、喘不上气、头晕得厉害、突然说话不清楚，第一句话就让他们马上拨打 120 或请身边的人帮忙，不要先讲别的。
-
-            回答用短句，分条列出，每条一句话，不用英文和专业术语。
-        memory:
-          window:
-            enabled: true
-            size: 10
-          query_prompt_template: '{{#sys.query#}}'
-          role_prefix:
-            user: ''
-            assistant: ''
-        context:
-          enabled: false
-          variable_selector: []
-        vision:
-          enabled: false
-        variables: []
-    - id: chat
-      type: custom
-      position: {x: 960, y: 580}
-      positionAbsolute: {x: 960, y: 580}
-      width: 244
-      height: 98
+        tool_node_version: '2'
+        type: agent
+      height: 216
+      id: health
+      position:
+        x: 960
+        y: 420
+      positionAbsolute:
+        x: 960
+        y: 420
       selected: false
       sourcePosition: right
       targetPosition: left
-      data:
-        type: llm
-        title: 陪聊与引导
+      type: custom
+      width: 242
+      zIndex: 0
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
         desc: ''
-        selected: false
+        memory:
+          query_prompt_template: '{{#sys.query#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: true
+            size: 10
         model:
-          provider: langgenius/tongyi/tongyi
-          name: qwen3.6-flash
-          mode: chat
           completion_params:
             temperature: 0.7
+            thinking: false
+          mode: chat
+          name: deepseek-v4-flash
+          provider: langgenius/deepseek/deepseek
         prompt_template:
         - id: sys-chat
           role: system
-          text: |-
-            你是一位温和、有耐心的出行小助手，正在和一位老人聊天。今天是{{#today.today#}}。
+          text: '你是一位温和、有耐心的出行小助手，正在和一位老人聊天。今天是{{#today.today#}}。
+
             - 亲切地回应，像晚辈一样说话，用“您”。
+
             - 如果老人看不懂或不会用，用最简单的话再解释一遍。
+
             - 自然地告诉老人你能帮的三件事：安排旅游路线、教怎么买车票机票、提醒出门要注意什么。
-            - 回答简短，三四句话就够，不用英文。
-        memory:
-          window:
-            enabled: true
-            size: 10
-          query_prompt_template: '{{#sys.query#}}'
-          role_prefix:
-            user: ''
-            assistant: ''
-        context:
-          enabled: false
-          variable_selector: []
+
+            - 回答简短，三四句话就够，不用英文。'
+        selected: false
+        title: 陪聊与引导
+        type: llm
+        variables: []
         vision:
           enabled: false
-        variables: []
-    - id: ans_trip
-      type: custom
-      position: {x: 1270, y: 100}
-      positionAbsolute: {x: 1270, y: 100}
-      width: 244
-      height: 103
+      height: 88
+      id: chat
+      position:
+        x: 960
+        y: 580
+      positionAbsolute:
+        x: 960
+        y: 580
       selected: false
       sourcePosition: right
       targetPosition: left
-      data:
-        type: answer
-        title: 回复攻略
-        desc: ''
-        selected: false
+      type: custom
+      width: 242
+      zIndex: 0
+    - data:
         answer: '{{#trip.text#}}'
+        desc: ''
+        selected: false
+        title: 回复攻略
+        type: answer
         variables: []
-    - id: ans_ticket
-      type: custom
-      position: {x: 1270, y: 260}
-      positionAbsolute: {x: 1270, y: 260}
-      width: 244
-      height: 103
+      height: 102
+      id: ans_trip
+      position:
+        x: 1270
+        y: 100
+      positionAbsolute:
+        x: 1270
+        y: 100
       selected: false
       sourcePosition: right
       targetPosition: left
-      data:
-        type: answer
-        title: 回复购票指导
-        desc: ''
-        selected: false
+      type: custom
+      width: 242
+      zIndex: 0
+    - data:
         answer: '{{#ticket.text#}}'
+        desc: ''
+        selected: false
+        title: 回复购票指导
+        type: answer
         variables: []
-    - id: ans_health
-      type: custom
-      position: {x: 1270, y: 420}
-      positionAbsolute: {x: 1270, y: 420}
-      width: 244
-      height: 103
+      height: 102
+      id: ans_ticket
+      position:
+        x: 1270
+        y: 260
+      positionAbsolute:
+        x: 1270
+        y: 260
       selected: false
       sourcePosition: right
       targetPosition: left
-      data:
-        type: answer
-        title: 回复健康提醒
-        desc: ''
-        selected: false
+      type: custom
+      width: 242
+      zIndex: 0
+    - data:
         answer: '{{#health.text#}}'
+        desc: ''
+        selected: false
+        title: 回复健康提醒
+        type: answer
         variables: []
-    - id: ans_chat
-      type: custom
-      position: {x: 1270, y: 580}
-      positionAbsolute: {x: 1270, y: 580}
-      width: 244
-      height: 103
+      height: 102
+      id: ans_health
+      position:
+        x: 1270
+        y: 420
+      positionAbsolute:
+        x: 1270
+        y: 420
       selected: false
       sourcePosition: right
       targetPosition: left
-      data:
-        type: answer
-        title: 回复聊天
+      type: custom
+      width: 242
+      zIndex: 0
+    - data:
+        answer: '{{#chat.text#}}'
         desc: ''
         selected: false
-        answer: '{{#chat.text#}}'
+        title: 回复聊天
+        type: answer
         variables: []
+      height: 102
+      id: ans_chat
+      position:
+        x: 1270
+        y: 580
+      positionAbsolute:
+        x: 1270
+        y: 580
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+      zIndex: 0
     viewport:
-      x: 0
-      y: 0
-      zoom: 0.7
+      x: -559.0986014283835
+      y: 85.75737667581902
+      zoom: 0.6764510003663081
+  rag_pipeline_variables: []
