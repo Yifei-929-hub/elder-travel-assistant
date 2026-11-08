@@ -1,0 +1,505 @@
+app:
+  description: 面向老年人的出行助手：旅游攻略、查票购票指导、出行健康与天气提醒，说话简单、步骤清楚、注意防骗。
+  icon: 🧓
+  icon_background: '#FFEAD5'
+  mode: advanced-chat
+  name: 老人出行小助手
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/tongyi:0.2.27@d9409c7d4e1ab9358330ee1c9897c29060f739657ec11e4aaab92f4265b376b6
+    version: null
+kind: app
+version: 0.4.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      enabled: false
+    opening_statement: |-
+      您好！我是您的出行小助手 😊
+      您可以直接告诉我：想去哪儿玩、想查哪天的车票，或者出门要注意什么。
+      说得不清楚也没关系，我会一步一步问您。
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions:
+    - 帮我安排一个杭州三日游，走路不要太多
+    - 下周想坐高铁去北京看孙子，怎么买票？
+    - 我有高血压，夏天出去旅游要注意什么？
+    suggested_questions_after_answer:
+      enabled: true
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - id: e_start_today
+      source: start
+      sourceHandle: source
+      target: today
+      targetHandle: target
+      type: custom
+      data:
+        isInIteration: false
+        sourceType: start
+        targetType: code
+    - id: e_today_classify
+      source: today
+      sourceHandle: source
+      target: classify
+      targetHandle: target
+      type: custom
+      data:
+        isInIteration: false
+        sourceType: code
+        targetType: question-classifier
+    - id: e_classify_trip
+      source: classify
+      sourceHandle: '1'
+      target: trip
+      targetHandle: target
+      type: custom
+      data:
+        isInIteration: false
+        sourceType: question-classifier
+        targetType: llm
+    - id: e_classify_ticket
+      source: classify
+      sourceHandle: '2'
+      target: ticket
+      targetHandle: target
+      type: custom
+      data:
+        isInIteration: false
+        sourceType: question-classifier
+        targetType: llm
+    - id: e_classify_health
+      source: classify
+      sourceHandle: '3'
+      target: health
+      targetHandle: target
+      type: custom
+      data:
+        isInIteration: false
+        sourceType: question-classifier
+        targetType: llm
+    - id: e_classify_chat
+      source: classify
+      sourceHandle: '4'
+      target: chat
+      targetHandle: target
+      type: custom
+      data:
+        isInIteration: false
+        sourceType: question-classifier
+        targetType: llm
+    - id: e_trip_ans
+      source: trip
+      sourceHandle: source
+      target: ans_trip
+      targetHandle: target
+      type: custom
+      data:
+        isInIteration: false
+        sourceType: llm
+        targetType: answer
+    - id: e_ticket_ans
+      source: ticket
+      sourceHandle: source
+      target: ans_ticket
+      targetHandle: target
+      type: custom
+      data:
+        isInIteration: false
+        sourceType: llm
+        targetType: answer
+    - id: e_health_ans
+      source: health
+      sourceHandle: source
+      target: ans_health
+      targetHandle: target
+      type: custom
+      data:
+        isInIteration: false
+        sourceType: llm
+        targetType: answer
+    - id: e_chat_ans
+      source: chat
+      sourceHandle: source
+      target: ans_chat
+      targetHandle: target
+      type: custom
+      data:
+        isInIteration: false
+        sourceType: llm
+        targetType: answer
+    nodes:
+    - id: start
+      type: custom
+      position: {x: 30, y: 300}
+      positionAbsolute: {x: 30, y: 300}
+      width: 244
+      height: 54
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      data:
+        type: start
+        title: 开始
+        desc: ''
+        selected: false
+        variables: []
+    - id: today
+      type: custom
+      position: {x: 330, y: 300}
+      positionAbsolute: {x: 330, y: 300}
+      width: 244
+      height: 54
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      data:
+        type: code
+        title: 获取今天日期
+        desc: 北京时间的今天日期和星期，供后面安排行程、查票时参考
+        selected: false
+        code_language: python3
+        code: |
+          from datetime import datetime, timedelta, timezone
+
+
+          def main() -> dict:
+              now = datetime.now(timezone(timedelta(hours=8)))
+              weekdays = ["一", "二", "三", "四", "五", "六", "日"]
+              return {
+                  "today": now.strftime("%Y年%m月%d日") + "，星期" + weekdays[now.weekday()],
+              }
+        variables: []
+        outputs:
+          today:
+            type: string
+            children: null
+    - id: classify
+      type: custom
+      position: {x: 630, y: 300}
+      positionAbsolute: {x: 630, y: 300}
+      width: 244
+      height: 250
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      data:
+        type: question-classifier
+        title: 判断老人想做什么
+        desc: ''
+        selected: false
+        query_variable_selector:
+        - sys
+        - query
+        model:
+          provider: langgenius/tongyi/tongyi
+          name: qwen3.6-flash
+          mode: chat
+          completion_params:
+            temperature: 0.1
+        classes:
+        - id: '1'
+          name: 旅游攻略：想去哪里玩、行程安排、景点、住宿、吃什么、怎么玩
+        - id: '2'
+          name: 车票机票：查火车票/高铁/飞机票、怎么买票、退票改签、到车站机场怎么走
+        - id: '3'
+          name: 出行健康与注意事项：身体状况、带什么药、天气、穿衣、安全提醒
+        - id: '4'
+          name: 其他：打招呼、闲聊、看不懂、不属于以上的问题
+        instruction: 用户是老年人，说话可能口语化、带方言或不完整。结合上下文判断，比如“那后天呢”通常是在接着上一个话题问。
+        instructions: ''
+        topics: []
+        vision:
+          enabled: false
+        memory:
+          window:
+            enabled: true
+            size: 6
+    - id: trip
+      type: custom
+      position: {x: 960, y: 100}
+      positionAbsolute: {x: 960, y: 100}
+      width: 244
+      height: 98
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      data:
+        type: llm
+        title: 写旅游攻略
+        desc: ''
+        selected: false
+        model:
+          provider: langgenius/tongyi/tongyi
+          name: qwen3.6-plus
+          mode: chat
+          completion_params:
+            temperature: 0.6
+        prompt_template:
+        - id: sys-trip
+          role: system
+          text: |-
+            你是一位耐心、贴心的出行顾问，专门帮老年人规划旅游。今天是{{#today.today#}}。
+
+            【先问清楚再规划】如果老人没说清楚，先用一两个简单问题问（一次最多问两个）：从哪里出发、想去哪、去几天、几个人、腿脚和身体怎么样。信息够了就直接给方案，不要反复追问。
+
+            【规划原则】
+            - 节奏慢：每天最多 2 个主要景点，中午留出休息时间，晚上不安排远距离活动。
+            - 少走路、少换乘：优先直达交通、有电梯/缆车/观光车的景点，标出步行大概多久。
+            - 每天都写上：附近的医院或药店方向、哪里有厕所和休息的地方。
+            - 提醒老年优惠：很多景区 60 岁或 65 岁以上凭身份证免票或半价，但要提醒以景区公告为准。
+            - 住宿建议：交通方便、有电梯、离医院不远。
+            - 饮食清淡，提醒少吃生冷辛辣。
+
+            【回答格式】
+            - 用“第一天 / 第二天”分段，每段 3～5 行，每行一句短话。
+            - 不用英文、不用生僻词，数字说清楚（例如“大约走 10 分钟”）。
+            - 最后用一句话总结，并问老人要不要帮忙查车票或看看出门要带什么。
+
+            【诚实】你没有实时数据，不要编造具体的开放时间、票价、车次。涉及这些就说“大概”，并提醒出发前打电话或在官方渠道确认。
+        memory:
+          window:
+            enabled: true
+            size: 10
+          query_prompt_template: '{{#sys.query#}}'
+          role_prefix:
+            user: ''
+            assistant: ''
+        context:
+          enabled: false
+          variable_selector: []
+        vision:
+          enabled: false
+        variables: []
+    - id: ticket
+      type: custom
+      position: {x: 960, y: 260}
+      positionAbsolute: {x: 960, y: 260}
+      width: 244
+      height: 98
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      data:
+        type: llm
+        title: 查票买票指导
+        desc: ''
+        selected: false
+        model:
+          provider: langgenius/tongyi/tongyi
+          name: qwen3.6-plus
+          mode: chat
+          completion_params:
+            temperature: 0.3
+        prompt_template:
+        - id: sys-ticket
+          role: system
+          text: |-
+            你是一位耐心的购票指导员，帮老年人买火车票、高铁票、飞机票。今天是{{#today.today#}}。
+
+            【你能做什么】你不能替老人下单或付款，也查不到实时余票。你要做的是：帮老人想清楚买什么票，再手把手教他们怎么买。
+
+            【先问清楚】从哪里到哪里、哪天走、几个人、想坐高铁还是飞机。一次最多问两个问题。
+
+            【给建议时】
+            - 推荐白天出发（上午 9 点到下午 4 点之间）、直达不换乘的车次。
+            - 卧铺建议下铺（铁路 12306 对 60 岁以上旅客会优先安排下铺），高铁建议靠过道，方便上厕所。
+            - 提醒提前 1 小时到车站，带好身份证。
+            - 不要编造具体车次、时刻和票价，只能说“一般有……，具体以 12306 查到的为准”。
+
+            【教买票，分步骤，每步一行】
+            - 火车/高铁：打开“铁路12306”App → 首页点“敬老版”（字大好用）→ 填出发地、目的地、日期 → 查询 → 选车次 → 选乘车人 → 提交订单 → 付款。
+            - 不会用手机：可以到火车站人工窗口买，或者拨打 12306 客服电话，也可以请子女帮忙在 App 上给您买。
+            - 飞机票：建议在航空公司官方 App 或官网买，或请子女帮忙。
+
+            【防骗，每次都要提醒一句】
+            - 12306 和航空公司不会打电话让您“退票改签”还转账。
+            - 不要把身份证号、银行卡号、验证码告诉任何陌生人，包括我。
+            如果老人主动发来身份证号、银行卡号或验证码，提醒他们不要发，也不要在回答里重复这些号码。
+
+            【回答格式】短句、分步骤、不用英文，最后问一句“需要我再说一遍哪一步吗？”
+        memory:
+          window:
+            enabled: true
+            size: 10
+          query_prompt_template: '{{#sys.query#}}'
+          role_prefix:
+            user: ''
+            assistant: ''
+        context:
+          enabled: false
+          variable_selector: []
+        vision:
+          enabled: false
+        variables: []
+    - id: health
+      type: custom
+      position: {x: 960, y: 420}
+      positionAbsolute: {x: 960, y: 420}
+      width: 244
+      height: 98
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      data:
+        type: llm
+        title: 出行健康提醒
+        desc: ''
+        selected: false
+        model:
+          provider: langgenius/tongyi/tongyi
+          name: qwen3.6-plus
+          mode: chat
+          completion_params:
+            temperature: 0.3
+        prompt_template:
+        - id: sys-health
+          role: system
+          text: |-
+            你是一位细心的出行健康顾问，帮老年人做好出门前的准备。今天是{{#today.today#}}。
+
+            - 根据老人说的身体情况（高血压、糖尿病、心脏病、腿脚不便等）和目的地、季节，给出具体可做的建议：带什么药、怎么穿、哪些活动要避免。
+            - 给一个“出门清单”：身份证、常用药（多带几天的量）、病历或用药单、老花镜、充电宝、紧急联系人电话写在纸上放口袋里。
+            - 你查不到实时天气，只能按季节和地方说一般情况，并提醒出发前看天气预报。
+            - 你不是医生：涉及换药、调整剂量、能不能去高原等问题，要建议先问自己的医生。
+            - 如果老人说现在胸痛、喘不上气、头晕得厉害、突然说话不清楚，第一句话就让他们马上拨打 120 或请身边的人帮忙，不要先讲别的。
+
+            回答用短句，分条列出，每条一句话，不用英文和专业术语。
+        memory:
+          window:
+            enabled: true
+            size: 10
+          query_prompt_template: '{{#sys.query#}}'
+          role_prefix:
+            user: ''
+            assistant: ''
+        context:
+          enabled: false
+          variable_selector: []
+        vision:
+          enabled: false
+        variables: []
+    - id: chat
+      type: custom
+      position: {x: 960, y: 580}
+      positionAbsolute: {x: 960, y: 580}
+      width: 244
+      height: 98
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      data:
+        type: llm
+        title: 陪聊与引导
+        desc: ''
+        selected: false
+        model:
+          provider: langgenius/tongyi/tongyi
+          name: qwen3.6-flash
+          mode: chat
+          completion_params:
+            temperature: 0.7
+        prompt_template:
+        - id: sys-chat
+          role: system
+          text: |-
+            你是一位温和、有耐心的出行小助手，正在和一位老人聊天。今天是{{#today.today#}}。
+            - 亲切地回应，像晚辈一样说话，用“您”。
+            - 如果老人看不懂或不会用，用最简单的话再解释一遍。
+            - 自然地告诉老人你能帮的三件事：安排旅游路线、教怎么买车票机票、提醒出门要注意什么。
+            - 回答简短，三四句话就够，不用英文。
+        memory:
+          window:
+            enabled: true
+            size: 10
+          query_prompt_template: '{{#sys.query#}}'
+          role_prefix:
+            user: ''
+            assistant: ''
+        context:
+          enabled: false
+          variable_selector: []
+        vision:
+          enabled: false
+        variables: []
+    - id: ans_trip
+      type: custom
+      position: {x: 1270, y: 100}
+      positionAbsolute: {x: 1270, y: 100}
+      width: 244
+      height: 103
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      data:
+        type: answer
+        title: 回复攻略
+        desc: ''
+        selected: false
+        answer: '{{#trip.text#}}'
+        variables: []
+    - id: ans_ticket
+      type: custom
+      position: {x: 1270, y: 260}
+      positionAbsolute: {x: 1270, y: 260}
+      width: 244
+      height: 103
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      data:
+        type: answer
+        title: 回复购票指导
+        desc: ''
+        selected: false
+        answer: '{{#ticket.text#}}'
+        variables: []
+    - id: ans_health
+      type: custom
+      position: {x: 1270, y: 420}
+      positionAbsolute: {x: 1270, y: 420}
+      width: 244
+      height: 103
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      data:
+        type: answer
+        title: 回复健康提醒
+        desc: ''
+        selected: false
+        answer: '{{#health.text#}}'
+        variables: []
+    - id: ans_chat
+      type: custom
+      position: {x: 1270, y: 580}
+      positionAbsolute: {x: 1270, y: 580}
+      width: 244
+      height: 103
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      data:
+        type: answer
+        title: 回复聊天
+        desc: ''
+        selected: false
+        answer: '{{#chat.text#}}'
+        variables: []
+    viewport:
+      x: 0
+      y: 0
+      zoom: 0.7
